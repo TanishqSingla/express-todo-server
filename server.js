@@ -1,18 +1,17 @@
-const Database = require("better-sqlite3");
-const express = require("express");
-const router = require("./router");
-const { initTable } = require("./models/db");
-const app = express();
+const { initTable, db } = require("./models/db");
+const app = require('./app');
+const dotenv = require('dotenv');
 
-app.use(express.json());
-
-const db = new Database("todo.db");
-if (db) {
-  console.log(initTable(db));
-  console.log("Successfully connected to database");
+if(process.env.NODE_ENV) {
+	dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
+} else {
+	dotenv.config();
 }
 
-app.set("db", db);
-app.use("/", router);
+const { PORT, DATABASE_NAME } = process.env;
 
-app.listen(4000, () => console.log("Server running on http://127.0.0.1:4000"));
+if (db) {
+	console.log(initTable(db, DATABASE_NAME));
+}
+
+app.listen(PORT, () => console.log(`Server running on http://127.0.0.1:${PORT}`));
